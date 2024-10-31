@@ -1,4 +1,39 @@
 <?php
+   function save_data_supabase($email, $passwd) {
+      //supabase  database configuration
+      $SUPABASE_URL = 'https://msfpoooebqxfejlpbcmo.supabase.co';
+      $SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zZnBvb29lYnF4ZmVqbHBiY21vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzAzODg2ODYsImV4cCI6MjA0NTk2NDY4Nn0.6LxegkOy1UlG8agVMqLnYyopZUPSbLeQnlWjmJu8xew';
+
+      $url = "$SUPABASE_URL/rest/v1/users";
+      $data = [
+         'email' => $email,
+         'password' => $passwd,
+      ];
+
+      $options = [
+         'http' => [
+            'header' => [
+            "content-Type: application/json",
+            "Authorization: Bearer $SUPABASE_KEY",
+            "apikey: $SUPABASE_KEY"
+         ],
+            'method' => 'POST',
+            'content' => json_encode($data),
+         ],   
+      ];	
+
+      $context = stream_context_create($options);
+      $response = file_get_contents($url, true , $context);
+      //$response_data = json_decode($response, true);
+
+      if($response === false) {
+         echo "Error: unable to save data supabase";
+         exit;
+      }
+
+      echo "user has been created.";
+   }
+
    //DB connection
    require('../../config/db_connection.php');
    //Get data from register form
@@ -27,10 +62,11 @@
    //Check if the query was successful
    if($result) {
      // echo "Registration successful!";
+     save_data_supabase($email, $enc_pass);
      echo "<script>alert('Registration successful!');</script>";
      header('Refresh:0;url=http://127.0.0.1/beta/api/src/login_form.html');
    } else {
-      echo "Registration failes: ";
+      echo "Registration failed ";
    }
 
    pg_close($conn);
